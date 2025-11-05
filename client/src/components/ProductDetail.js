@@ -1,59 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import { useProduct } from '../hooks/useProduct';
+import { calculateEMI } from '../utils/emiCalculator';
 
 function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
+  const { product, loading, error } = useProduct(slug);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedEMIPlan, setSelectedEMIPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchProduct();
-  }, [slug]);
 
   useEffect(() => {
     if (product && product.variants && product.variants.length > 0 && !selectedVariant) {
       setSelectedVariant(product.variants[0]);
     }
   }, [product, selectedVariant]);
-
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
-      if (!response.ok) {
-        throw new Error('Product not found');
-      }
-      const data = await response.json();
-      setProduct(data);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  const calculateEMI = (principal, tenure, interestRate) => {
-    const principalNum = parseFloat(principal) || 0;
-    const tenureNum = parseInt(tenure) || 0;
-    const interestRateNum = parseFloat(interestRate) || 0;
-
-    if (tenureNum === 0) {
-      return 0;
-    }
-
-    if (interestRateNum === 0) {
-      return principalNum / tenureNum;
-    }
-    const monthlyRate = interestRateNum / 100 / 12;
-    const emi = (principalNum * monthlyRate * Math.pow(1 + monthlyRate, tenureNum)) /
-                (Math.pow(1 + monthlyRate, tenureNum) - 1);
-    return emi;
-  };
 
   const handleProceed = () => {
     if (!selectedVariant || !selectedEMIPlan) {
@@ -101,75 +62,70 @@ function ProductDetail() {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <img
-            src={selectedVariant?.image_url || 'https://via.placeholder.com/500x500'}
-            alt={product.name}
-            className="w-full h-auto rounded-lg"
-          />
+        <div>
+          <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+            <img
+              src={selectedVariant?.image_url || 'https://via.placeholder.com/500x500'}
+              alt={product.name}
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Available Variants</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+              {product.variants?.map((variant) => (
+                <button
+                  key={variant.id}
+                  onClick={() => setSelectedVariant(variant)}
+                  className={`p-3 border-2 rounded-lg transition-all text-center bg-white hover:bg-gray-50 ${
+                    selectedVariant?.id === variant.id
+                      ? 'border-blue-600 bg-blue-50 shadow-lg scale-105 ring-2 ring-blue-200'
+                      : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="mb-2.5 relative">
+                    <img
+                      src={variant.image_url || 'https://via.placeholder.com/150x150'}
+                      alt={variant.name}
+                      className={`w-full h-24 sm:h-28 object-contain rounded-md transition-transform ${
+                        selectedVariant?.id === variant.id ? 'scale-110' : 'hover:scale-105'
+                      }`}
+                    />
+                    {selectedVariant?.id === variant.id && (
+                      <div className="absolute top-1 right-1 bg-blue-600 rounded-full p-1">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem]">
+                    {variant.name}
+                  </div>
+                  {variant.color && (
+                    <div className="text-xs text-gray-600 mb-0.5 font-medium">{variant.color}</div>
+                  )}
+                  {variant.storage && (
+                    <div className="text-xs text-gray-500 mb-1.5 font-medium">{variant.storage}</div>
+                  )}
+                  <div className="text-xs font-bold text-blue-600 mb-0.5">
+                    ₹{parseFloat(variant.price).toLocaleString('en-IN')}
+                  </div>
+                  {variant.mrp !== variant.price && (
+                    <div className="text-xs text-gray-400 line-through">
+                      ₹{parseFloat(variant.mrp).toLocaleString('en-IN')}
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
           <p className="text-gray-600 mb-6">{product.description}</p>
-
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">Select Variant</h2>
-            <div className="space-y-2">
-              {product.variants?.map((variant) => (
-                <button
-                  key={variant.id}
-                  onClick={() => setSelectedVariant(variant)}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition-colors ${
-                    selectedVariant?.id === variant.id
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-semibold text-gray-900">{variant.name}</div>
-                      {variant.color && (
-                        <div className="text-sm text-gray-600">Color: {variant.color}</div>
-                      )}
-                      {variant.storage && (
-                        <div className="text-sm text-gray-600">Storage: {variant.storage}</div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">
-                        ₹{variant.price?.toLocaleString('en-IN')}
-                      </div>
-                      {variant.mrp !== variant.price && (
-                        <div className="text-sm text-gray-500 line-through">
-                          ₹{variant.mrp?.toLocaleString('en-IN')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {selectedVariant && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">Price:</span>
-                <span className="text-2xl font-bold text-gray-900">
-                  ₹{selectedVariant.price?.toLocaleString('en-IN')}
-                </span>
-              </div>
-              {selectedVariant.mrp !== selectedVariant.price && (
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">MRP:</span>
-                  <span className="text-lg text-gray-500 line-through">
-                    ₹{selectedVariant.mrp?.toLocaleString('en-IN')}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
 
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-3">Available EMI Plans</h2>
