@@ -11,9 +11,10 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'postgres',
 });
 
+// Database initialization function
 async function initDatabase() {
   try {
-    // Create tables
+    // Create database tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,

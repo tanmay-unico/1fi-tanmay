@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+// Product detail component
 function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
