@@ -1,4 +1,4 @@
-# EMI Product Store - Full-Stack Web Application
+# EMI Product Store - Tanmay Lautawar
 
 A full-stack web application that displays products (smartphones) with multiple EMI plans backed by mutual funds. The app retrieves dynamic data from a PostgreSQL database via REST APIs and presents it in a responsive, user-friendly React interface.
 
