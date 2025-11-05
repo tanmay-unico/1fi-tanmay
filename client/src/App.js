@@ -5,7 +5,6 @@ import ProductDetail from './components/ProductDetail';
 import CheckoutPage from './components/CheckoutPage';
 import './App.css';
 
-// Main App component
 function App() {
   return (
     <Router>

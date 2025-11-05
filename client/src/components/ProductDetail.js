@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-// Product detail component
 function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -39,7 +38,6 @@ function ProductDetail() {
   };
 
   const calculateEMI = (principal, tenure, interestRate) => {
-    // Convert to numbers to handle string values from database
     const principalNum = parseFloat(principal) || 0;
     const tenureNum = parseInt(tenure) || 0;
     const interestRateNum = parseFloat(interestRate) || 0;
@@ -62,15 +60,12 @@ function ProductDetail() {
       alert('Please select a variant and an EMI plan');
       return;
     }
-    // Store checkout data and navigate to checkout page
     const checkoutData = {
       product,
       variant: selectedVariant,
       plan: selectedEMIPlan,
     };
-    // Store in localStorage as backup
     localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-    // Navigate with state
     navigate('/checkout', { state: checkoutData });
   };
 
@@ -106,7 +101,6 @@ function ProductDetail() {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Product Image */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <img
             src={selectedVariant?.image_url || 'https://via.placeholder.com/500x500'}
@@ -115,12 +109,10 @@ function ProductDetail() {
           />
         </div>
 
-        {/* Product Details */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
           <p className="text-gray-600 mb-6">{product.description}</p>
 
-          {/* Variant Selection */}
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-3">Select Variant</h2>
             <div className="space-y-2">
@@ -160,7 +152,6 @@ function ProductDetail() {
             </div>
           </div>
 
-          {/* Price Display */}
           {selectedVariant && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-center mb-2">
@@ -180,7 +171,6 @@ function ProductDetail() {
             </div>
           )}
 
-          {/* EMI Plans */}
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-3">Available EMI Plans</h2>
             <div className="space-y-3">
@@ -228,7 +218,6 @@ function ProductDetail() {
             </div>
           </div>
 
-          {/* Proceed Button */}
           <button
             onClick={handleProceed}
             disabled={!selectedVariant || !selectedEMIPlan}

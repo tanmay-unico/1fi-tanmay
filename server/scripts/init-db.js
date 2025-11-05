@@ -11,10 +11,8 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'postgres',
 });
 
-// Database initialization function
 async function initDatabase() {
   try {
-    // Create database tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -58,7 +56,6 @@ async function initDatabase() {
 
     console.log('Tables created successfully');
 
-    // Insert sample products
     const products = [
       {
         name: 'Apple iPhone 17 Pro',
@@ -92,7 +89,6 @@ async function initDatabase() {
       if (productResult.rows.length > 0) {
         const productId = productResult.rows[0].id;
 
-        // Insert variants for each product
         let variants = [];
         if (product.slug === 'apple-iphone-17-pro') {
           variants = [
@@ -124,7 +120,6 @@ async function initDatabase() {
       }
     }
 
-    // Insert EMI plans
     const emiPlans = [
       { name: '3 Months - 0% Interest', tenure_months: 3, interest_rate: 0, cashback: 0, cashback_description: null, min_amount: 0 },
       { name: '6 Months - 0% Interest', tenure_months: 6, interest_rate: 0, cashback: 0, cashback_description: null, min_amount: 0 },
@@ -134,7 +129,6 @@ async function initDatabase() {
       { name: '24 Months - 12% Interest', tenure_months: 24, interest_rate: 12, cashback: 2000, cashback_description: 'Get ₹2000 cashback', min_amount: 0 },
     ];
 
-    // Clear existing EMI plans to avoid duplicates
     await pool.query('DELETE FROM emi_plans');
 
     for (const plan of emiPlans) {

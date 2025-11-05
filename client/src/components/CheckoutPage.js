@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-// Checkout page component
 function CheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [checkoutData, setCheckoutData] = useState(null);
 
   useEffect(() => {
-    // Get data from location state or localStorage
     const data = location.state || JSON.parse(localStorage.getItem('checkoutData') || 'null');
     
     if (!data || !data.variant || !data.plan || !data.product) {
-      // If no data, show empty state
       return;
     }
     
@@ -51,7 +48,6 @@ function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/')}
@@ -67,9 +63,7 @@ function CheckoutPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content - Product & Plan Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Product Card */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
                 <h2 className="text-2xl font-bold text-white mb-1">Product Details</h2>
@@ -131,7 +125,6 @@ function CheckoutPage() {
               </div>
             </div>
 
-            {/* EMI Plan Card */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="bg-gradient-to-r from-green-600 to-teal-600 p-6">
                 <h2 className="text-2xl font-bold text-white mb-1">EMI Plan Details</h2>
@@ -182,7 +175,6 @@ function CheckoutPage() {
             </div>
           </div>
 
-          {/* Sidebar - Payment Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-8">
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6">
@@ -190,7 +182,6 @@ function CheckoutPage() {
                 <p className="text-purple-100">Your order breakdown</p>
               </div>
               <div className="p-6 space-y-6">
-                {/* Monthly Payment Highlight */}
                 <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
                   <div className="text-sm text-gray-600 mb-2">Monthly Payment</div>
                   <div className="text-4xl font-bold text-purple-600 mb-2">
@@ -199,7 +190,6 @@ function CheckoutPage() {
                   <div className="text-sm text-gray-500">for {plan.tenure_months} months</div>
                 </div>
 
-                {/* Breakdown */}
                 <div className="space-y-4 pt-4 border-t">
                   <div className="flex justify-between text-gray-700">
                     <span>Product Price</span>
@@ -237,8 +227,6 @@ function CheckoutPage() {
                   )}
                 </div>
 
-
-                {/* Trust Badges */}
                 <div className="pt-6 border-t">
                   <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
                     <div className="flex items-center">
